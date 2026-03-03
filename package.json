@@ -1,6 +1,6 @@
 {
   "name": "uv-card",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Neural Orb UV index card for Home Assistant using OpenUV",
   "type": "module",
   "main": "dist/uv-card.js",

@@ -53,7 +53,7 @@ export class UVCard extends LitElement {
         (id.includes("uv_index") || id.includes("current_uv"))
     );
     return {
-      type: "uv-card",
+      type: "custom:uv-card",
       uv_index_entity: uvEntity ?? "sensor.current_uv_index",
       show_sun_arc: true,
     };
