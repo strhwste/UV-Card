@@ -74,13 +74,11 @@ export class UVCard extends LitElement {
   protected updated(changedProperties: PropertyValues): void {
     super.updated(changedProperties);
 
-    // Only update CSS variables when the UV color actually changes
+    // Only update CSS variable when the UV color actually changes
     const color = getUVLevel(this._targetUV).color;
     if (color !== this._lastColor) {
       this._lastColor = color;
-      const alphaHex = Math.round(0.28 * 255).toString(16).padStart(2, "0");
       this.style.setProperty("--uv-color", color);
-      this.style.setProperty("--uv-color-alpha", color + alphaHex);
     }
 
     // Handle hass changes: check if UV value changed
@@ -188,16 +186,29 @@ export class UVCard extends LitElement {
     const dotX = (cxSvg + r * Math.cos(angle)).toFixed(2);
     const dotY = (cySvg - r * Math.sin(angle)).toFixed(2);
 
+    // Shadow on the horizon line: wider when sun is low, tighter at zenith
+    const sunHeight = Math.sin(angle);
+    const shadowRx = (3 + 8 * (1 - sunHeight)).toFixed(1);
+    const shadowOpacity = (0.06 + 0.14 * sunHeight).toFixed(2);
+
     return html`
       <div class="sun-arc-wrapper">
         <svg
           class="sun-arc"
-          viewBox="0 0 200 58"
+          viewBox="0 0 200 60"
           xmlns="http://www.w3.org/2000/svg"
           aria-hidden="true"
         >
           <path class="sun-track" d="M 14 52 A 86 86 0 0 1 186 52" />
-          <circle class="sun-dot" cx="${dotX}" cy="${dotY}" r="7" />
+          <ellipse
+            class="sun-shadow"
+            cx="${dotX}"
+            cy="55"
+            rx="${shadowRx}"
+            ry="1.5"
+            opacity="${shadowOpacity}"
+          />
+          <circle class="sun-dot" cx="${dotX}" cy="${dotY}" r="5" />
         </svg>
       </div>
     `;
@@ -277,9 +288,6 @@ export class UVCard extends LitElement {
           ${cardName ? html`<div class="card-name">${cardName}</div>` : ""}
           ${this._renderSunArc()}
           <div class="orb-container">
-            <div class="ripple-ring"></div>
-            <div class="ripple-ring"></div>
-            <div class="ripple-ring"></div>
             <div
               class="orb"
               role="img"
@@ -292,7 +300,7 @@ export class UVCard extends LitElement {
           <div class="stats-row">
             ${maxUV !== "—"
               ? html`
-                  <div class="stat-chip">
+                  <div class="stat-item">
                     <span class="stat-label">Max Today</span>
                     <span class="stat-value highlight">${maxUV}</span>
                   </div>
@@ -300,7 +308,7 @@ export class UVCard extends LitElement {
               : ""}
             ${safeExposure !== "—"
               ? html`
-                  <div class="stat-chip">
+                  <div class="stat-item">
                     <span class="stat-label">Safe Time</span>
                     <span class="stat-value">${safeExposure} min</span>
                   </div>
@@ -308,7 +316,7 @@ export class UVCard extends LitElement {
               : ""}
             ${protWindow !== "—"
               ? html`
-                  <div class="stat-chip">
+                  <div class="stat-item">
                     <span class="stat-label">Protection</span>
                     <span class="stat-value">${protWindow}</span>
                   </div>
