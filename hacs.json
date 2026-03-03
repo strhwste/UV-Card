@@ -3,7 +3,7 @@
   "description": "Neural Orb UV index card for Home Assistant using OpenUV",
   "render_readme": true,
   "category": "plugin",
-  "homeassistant": "2023.9.0",
+  "homeassistant": "2026.2.0",
   "filename": "dist/uv-card.js",
   "content_in_root": false
 }

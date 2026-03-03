@@ -26,6 +26,20 @@ export class UVCard extends LitElement {
 
   static styles = cardStyles;
 
+  // Sections dashboard grid layout (HA 2023.10+)
+  // Section width is divided into 12 columns (~30px each); rows are 56px tall.
+  // Recommend multiples of 3 for columns.
+  static getGridOptions() {
+    return {
+      grid_rows: 4,
+      grid_columns: 6,      // half a section width by default
+      grid_min_rows: 3,
+      grid_max_rows: 8,
+      grid_min_columns: 3,
+      grid_max_columns: 12,
+    };
+  }
+
   static getConfigElement(): HTMLElement {
     return document.createElement("uv-card-editor");
   }
