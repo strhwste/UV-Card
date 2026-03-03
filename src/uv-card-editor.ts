@@ -10,10 +10,9 @@ declare global {
       value: string;
       includeDomains: string[];
     };
+    "ha-textfield": HTMLElement & { value: string };
     "ha-formfield": HTMLElement;
     "ha-switch": HTMLElement & { checked: boolean };
-    "ha-select": HTMLElement & { value: string };
-    "ha-list-item": HTMLElement;
   }
 }
 
@@ -54,7 +53,7 @@ export class UVCardEditor extends LitElement {
     }
 
     ha-entity-picker,
-    ha-select {
+    ha-textfield {
       width: 100%;
     }
 
@@ -69,25 +68,27 @@ export class UVCardEditor extends LitElement {
     this._config = config;
   }
 
+  // ha-entity-picker and ha-textfield fire value-changed with detail.value
   private _entityChanged(ev: CustomEvent, field: keyof UVCardConfig): void {
     if (!this._config) return;
-    const value = (ev.target as HTMLInputElement).value;
+    const value = (ev.detail as { value: string }).value;
     fireEvent(this, "config-changed", {
       config: { ...this._config, [field]: value || undefined },
     });
   }
 
-  private _toggleChanged(ev: CustomEvent, field: keyof UVCardConfig): void {
+  // ha-switch fires change; target.checked holds the new state
+  private _toggleChanged(ev: Event, field: keyof UVCardConfig): void {
     if (!this._config) return;
-    const checked = (ev.target as HTMLInputElement & { checked: boolean }).checked;
+    const checked = (ev.target as EventTarget & { checked: boolean }).checked;
     fireEvent(this, "config-changed", {
       config: { ...this._config, [field]: checked },
     });
   }
 
-  private _nameChanged(ev: Event): void {
+  private _nameChanged(ev: CustomEvent): void {
     if (!this._config) return;
-    const value = (ev.target as HTMLInputElement).value;
+    const value = (ev.detail as { value: string }).value;
     fireEvent(this, "config-changed", {
       config: { ...this._config, name: value || undefined },
     });
@@ -160,17 +161,16 @@ export class UVCardEditor extends LitElement {
             this._entityChanged(e, "uv_level_entity")}"
         ></ha-entity-picker>
 
-        <paper-input
+        <ha-textfield
           label="Card Name (optional)"
           .value="${cfg.name ?? ""}"
           @value-changed="${this._nameChanged}"
-        ></paper-input>
+        ></ha-textfield>
 
         <ha-formfield label="Show Sun Arc">
           <ha-switch
             .checked="${cfg.show_sun_arc !== false}"
-            @change="${(e: CustomEvent) =>
-              this._toggleChanged(e, "show_sun_arc")}"
+            @change="${(e: Event) => this._toggleChanged(e, "show_sun_arc")}"
           ></ha-switch>
         </ha-formfield>
       </div>

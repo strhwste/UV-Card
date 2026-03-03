@@ -23,6 +23,7 @@ export class UVCard extends LitElement {
   private _targetUV: number = 0;
   private _countUpRaf: number = 0;
   private _isFirstRender: boolean = true;
+  private _lastColor: string = "";
 
   static styles = cardStyles;
 
@@ -64,17 +65,22 @@ export class UVCard extends LitElement {
     this._config = { show_sun_arc: true, ...config };
   }
 
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    cancelAnimationFrame(this._countUpRaf);
+  }
+
   protected updated(changedProperties: PropertyValues): void {
     super.updated(changedProperties);
 
-    // Update UV color CSS variables whenever hass or displayedUV changes
-    const uvLevel = getUVLevel(this._targetUV);
-    const color = uvLevel.color;
-    const alphaHex = Math.round(0.28 * 255)
-      .toString(16)
-      .padStart(2, "0");
-    this.style.setProperty("--uv-color", color);
-    this.style.setProperty("--uv-color-alpha", color + alphaHex);
+    // Only update CSS variables when the UV color actually changes
+    const color = getUVLevel(this._targetUV).color;
+    if (color !== this._lastColor) {
+      this._lastColor = color;
+      const alphaHex = Math.round(0.28 * 255).toString(16).padStart(2, "0");
+      this.style.setProperty("--uv-color", color);
+      this.style.setProperty("--uv-color-alpha", color + alphaHex);
+    }
 
     // Handle hass changes: check if UV value changed
     if (changedProperties.has("hass") && this._config) {
@@ -232,6 +238,31 @@ export class UVCard extends LitElement {
   protected render(): TemplateResult {
     if (!this._config || !this.hass) {
       return html`<ha-card><div class="card-inner"></div></ha-card>`;
+    }
+
+    // Show error state if required entity is missing or unavailable
+    const entity = this.hass.states[this._config.uv_index_entity];
+    if (!entity) {
+      return html`
+        <ha-card>
+          <div class="card-inner error-state">
+            <span class="error-icon">⚠</span>
+            <span class="error-title">Entity not found</span>
+            <span class="error-body">${this._config.uv_index_entity}</span>
+          </div>
+        </ha-card>
+      `;
+    }
+    if (entity.state === "unavailable" || entity.state === "unknown") {
+      return html`
+        <ha-card>
+          <div class="card-inner error-state">
+            <span class="error-icon">⚠</span>
+            <span class="error-title">UV data unavailable</span>
+            <span class="error-body">${entity.state}</span>
+          </div>
+        </ha-card>
+      `;
     }
 
     const { maxUV, safeExposure, protWindow, uvLevel } = this._deriveStats();

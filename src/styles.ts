@@ -287,4 +287,30 @@ export const cardStyles = css`
   .stat-value.highlight {
     color: var(--uv-color, var(--primary-color));
   }
+
+  /* Error state */
+  .error-state {
+    justify-content: center;
+    padding: 24px 20px;
+    gap: 6px;
+    min-height: 120px;
+  }
+
+  .error-icon {
+    font-size: 1.8rem;
+    color: var(--error-color, #f44336);
+    line-height: 1;
+  }
+
+  .error-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary-text-color);
+  }
+
+  .error-body {
+    font-size: 0.75rem;
+    color: var(--secondary-text-color);
+    font-family: monospace;
+  }
 `;
