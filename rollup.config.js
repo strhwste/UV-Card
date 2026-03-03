@@ -5,7 +5,7 @@ import terser from "@rollup/plugin-terser";
 export default {
   input: "src/uv-card.ts",
   output: {
-    file: "dist/uv-card.js",
+    file: "uv-card.js",
     format: "es",
     sourcemap: false,
   },

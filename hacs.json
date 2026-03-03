@@ -4,6 +4,6 @@
   "render_readme": true,
   "category": "plugin",
   "homeassistant": "2026.2.0",
-  "filename": "dist/uv-card.js",
-  "content_in_root": false
+  "filename": "uv-card.js",
+  "content_in_root": true
 }

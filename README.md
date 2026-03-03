@@ -36,7 +36,7 @@ HACS automatically registers the resource — no manual `configuration.yaml` cha
 
 ## Manual Installation
 
-1. Download `dist/uv-card.js` from the [latest release](https://github.com/strhwste/UV-Card/releases)
+1. Download `uv-card.js` from the [latest release](https://github.com/strhwste/UV-Card/releases)
 2. Copy it to `<config>/www/uv-card/uv-card.js`
 3. Add the resource:
 
