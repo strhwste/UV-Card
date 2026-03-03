@@ -20,8 +20,8 @@ export const cardStyles = css`
     border-radius: var(--ha-card-border-radius, 12px);
     overflow: hidden;
     background: radial-gradient(
-      ellipse at 50% 10%,
-      color-mix(in srgb, var(--uv-color, #4caf50) 10%, transparent),
+      ellipse at 50% 30%,
+      color-mix(in srgb, var(--uv-color, #4caf50) 12%, transparent),
       transparent 70%
     );
     pointer-events: none;
@@ -38,7 +38,7 @@ export const cardStyles = css`
     gap: 8px;
   }
 
-  /* Sun arc */
+  /* ── Sun arc ── */
   .sun-arc-wrapper {
     width: 100%;
     max-width: 200px;
@@ -77,18 +77,54 @@ export const cardStyles = css`
     text-align: center;
   }
 
-  /* Orb container */
+  /* ── Orb container (holds glow + shadow + orb) ── */
   .orb-container {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 120px;
-    height: 120px;
-    margin: 4px 0 8px;
+    width: 160px;
+    height: 150px;
+    margin: 0 0 4px;
   }
 
-  /* The orb */
+  /* Soft colored glow behind the orb */
+  .orb-glow {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: var(--uv-color, #4caf50);
+    opacity: 0.2;
+    filter: blur(36px);
+    z-index: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+  }
+
+  /* Sun-driven shadow beneath the orb */
+  .orb-shadow {
+    position: absolute;
+    bottom: 4px;
+    width: 70px;
+    height: 14px;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse,
+      rgba(0, 0, 0, 0.35),
+      transparent 70%
+    );
+    transform:
+      translateX(var(--shadow-x, 0px))
+      translateY(var(--shadow-y, 0px))
+      scaleX(var(--shadow-scale-x, 1));
+    opacity: var(--shadow-opacity, 0.15);
+    z-index: 0;
+    pointer-events: none;
+    transition: transform 2s ease, opacity 2s ease;
+  }
+
+  /* ── The orb ── */
   .orb {
     position: relative;
     width: 110px;
@@ -99,15 +135,24 @@ export const cardStyles = css`
     align-items: center;
     justify-content: center;
     gap: 2px;
-    background: radial-gradient(
-      circle at 38% 32%,
-      color-mix(in srgb, var(--uv-color, #4caf50) 35%, white 65%),
-      color-mix(in srgb, var(--uv-color, #4caf50) 90%, black 10%)
-    );
+    /* Two-layer gradient: specular highlight + sphere shading */
+    background:
+      radial-gradient(
+        circle at 34% 28%,
+        rgba(255, 255, 255, 0.35),
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at 50% 50%,
+        color-mix(in srgb, var(--uv-color, #4caf50) 50%, white 50%),
+        color-mix(in srgb, var(--uv-color, #4caf50) 95%, black 5%)
+      );
     box-shadow:
-      0 4px 16px color-mix(in srgb, var(--uv-color, #4caf50) 30%, transparent),
-      0 0 0 1px color-mix(in srgb, var(--uv-color, #4caf50) 15%, transparent),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      0 4px 20px color-mix(in srgb, var(--uv-color, #4caf50) 35%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--uv-color, #4caf50) 12%, transparent),
+      inset 0 -2px 6px rgba(0, 0, 0, 0.08),
+      inset 0 2px 0 rgba(255, 255, 255, 0.12);
+    z-index: 1;
     cursor: default;
     user-select: none;
     transition: box-shadow 0.6s ease, background 0.6s ease;
@@ -144,7 +189,7 @@ export const cardStyles = css`
     font-weight: 700;
     line-height: 1;
     color: #ffffff;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.02em;
   }
@@ -155,10 +200,10 @@ export const cardStyles = css`
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.9);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
   }
 
-  /* Stats row */
+  /* ── Stats row ── */
   .stats-row {
     display: flex;
     gap: 16px;
@@ -198,7 +243,7 @@ export const cardStyles = css`
     color: var(--uv-color, var(--primary-color));
   }
 
-  /* Error state */
+  /* ── Error state ── */
   .error-state {
     justify-content: center;
     padding: 24px 16px;

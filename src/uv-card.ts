@@ -81,6 +81,11 @@ export class UVCard extends LitElement {
       this.style.setProperty("--uv-color", color);
     }
 
+    // Update orb shadow from sun position (azimuth + elevation)
+    if (changedProperties.has("hass") && this.hass) {
+      this._updateSunShadow();
+    }
+
     // Handle hass changes: check if UV value changed
     if (changedProperties.has("hass") && this._config) {
       const newUV = this._getUVFromHass();
@@ -147,6 +152,42 @@ export class UVCard extends LitElement {
       () => orb.classList.remove("orb-pulsing"),
       { once: true }
     );
+  }
+
+  /**
+   * Drive the orb shadow from the real sun position.
+   * Uses sun.sun elevation (0-90°) and azimuth (0-360°) to set
+   * CSS custom properties that position a shadow beneath the orb.
+   */
+  private _updateSunShadow(): void {
+    const sun = this.hass?.states["sun.sun"];
+    if (!sun) return;
+
+    const elevation = parseFloat(sun.attributes.elevation as string) || 0;
+    const azimuth = parseFloat(sun.attributes.azimuth as string) || 180;
+
+    if (elevation <= 0) {
+      // Sun below horizon: no shadow
+      this.style.setProperty("--shadow-opacity", "0");
+      return;
+    }
+
+    const azRad = (azimuth * Math.PI) / 180;
+    const elevNorm = Math.min(elevation, 90) / 90; // 0 at horizon, 1 at zenith
+
+    // Shadow offset: opposite to sun direction, stronger when sun is low
+    const strength = 1 - elevNorm;
+    const offsetX = -Math.sin(azRad) * strength * 18;
+    const offsetY = Math.cos(azRad) * strength * 6;
+    // Wider when sun is low, tighter at zenith
+    const scaleX = 1 + strength * 0.7;
+    // Brighter sun (higher) = stronger shadow, fade at very low angles
+    const opacity = Math.min(0.35, elevNorm * 0.45);
+
+    this.style.setProperty("--shadow-x", `${offsetX.toFixed(1)}px`);
+    this.style.setProperty("--shadow-y", `${offsetY.toFixed(1)}px`);
+    this.style.setProperty("--shadow-scale-x", scaleX.toFixed(2));
+    this.style.setProperty("--shadow-opacity", opacity.toFixed(2));
   }
 
   private _renderSunArc(): TemplateResult | string {
@@ -288,6 +329,8 @@ export class UVCard extends LitElement {
           ${cardName ? html`<div class="card-name">${cardName}</div>` : ""}
           ${this._renderSunArc()}
           <div class="orb-container">
+            <div class="orb-glow" aria-hidden="true"></div>
+            <div class="orb-shadow" aria-hidden="true"></div>
             <div
               class="orb"
               role="img"
