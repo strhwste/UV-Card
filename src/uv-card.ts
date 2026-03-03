@@ -7,6 +7,7 @@ import {
   UVLevelInfo,
   getUVLevel,
 } from "./types";
+import "./uv-card-editor";
 
 declare global {
   interface HTMLElementTagNameMap {
